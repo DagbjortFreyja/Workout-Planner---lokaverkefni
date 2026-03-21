@@ -61,6 +61,10 @@ Hono var valið þar sem það er einfalt og létt framework sem hentar vel fyri
 - Að bæta við interactivity án þess að nota client-side framework
 - Að útfæra progress tracking fyrir workout plans
 
+## próf
+```
+npx vitest
+```
 ```
 npm install
 npm run dev
