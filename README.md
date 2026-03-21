@@ -24,8 +24,6 @@ Helstu virkni:
 - Hakað við æfingar sem kláraðar
 - Séð framvindu (progress bar) fyrir hvert plan
 
-Verkefnið þróaðist meira en upphaflega var áætlað með því að bæta við workout plans og framvindumælingu.
-
 ## Tækni
 
 Eftirfarandi tækni var notuð:
@@ -61,10 +59,6 @@ Hono var valið þar sem það er einfalt og létt framework sem hentar vel fyri
 - Að bæta við interactivity án þess að nota client-side framework
 - Að útfæra progress tracking fyrir workout plans
 
-## próf
-```
-npx vitest
-```
 ```
 npm install
 npm run dev
@@ -72,4 +66,8 @@ npm run dev
 
 ```
 open http://localhost:3000
+```
+## próf
+```
+npx vitest
 ```
