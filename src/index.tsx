@@ -15,36 +15,102 @@ app.get("/plans/:id", async (c) => {
   const id = Number(c.req.param("id"))
 
   const items = await getPlanItems(id)
+  const total = items.length
+  const done = items.filter(i => i.done).length
+  const percent = total === 0 ? 0 : Math.round((done / total) * 100)
 
   return c.html(`
-    <h1>Workout Plan</h1>
 
-    <form method="post" action="/plans/${id}/items">
-      <input name="exercise" placeholder="Exercise" />
-      <input name="weight" placeholder="kg" />
-      <input name="reps" placeholder="reps" />
-      <input name="sets" placeholder="sets" />
-      <button>Add exercise</button>
-    </form>
+  <div style="max-width:600px; margin:40px auto; background:white; padding:20px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
 
-    <ul>
+    <h1>Workout Plan 💪</h1>
+
+    <p style="font-weight:600; margin-top:10px;">
+      ${percent}% completed
+    </p>
+    <p>${done} / ${total} exercises done</p>
+
+    ${percent === 100 ? `
+  <div style="
+    background:#dcfce7;
+    color:#166534;
+    padding:10px;
+    border-radius:8px;
+    margin-bottom:10px;
+    font-weight:600;
+  ">
+    🎉 Workout complete!
+  </div>
+` : ""}
+
+<div style="background:#eee; border-radius:8px; overflow:hidden; height:20px;">
+  <div style="width:${percent}%; background:linear-gradient(to right, #22c55e, #4ade80); height:100%;"></div>
+</div>
+
+    <form method="post" action="/plans/${id}/items" 
+  style="display:grid; grid-template-columns: 1fr 100px 100px 100px auto; gap:10px; margin-top:20px;">
+
+  <input name="exercise" placeholder="Exercise" style="padding:10px; border-radius:8px; border:1px solid #ddd;" />
+  <input name="weight" placeholder="kg" style="padding:10px; border-radius:8px; border:1px solid #ddd;" />
+  <input name="reps" placeholder="reps" style="padding:10px; border-radius:8px; border:1px solid #ddd;" />
+  <input name="sets" placeholder="sets" style="padding:10px; border-radius:8px; border:1px solid #ddd;" />
+
+  <button style="
+    background:#6366f1;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    font-weight:600;
+    cursor:pointer;
+  ">
+    +
+  </button>
+
+</form>
+
+    <ul style="list-style:none; padding:0; margin-top:20px;">
       ${items.map((i) => `
-        <li>
+        <li style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:14px;
+        margin-top:12px;
+        background:white;
+        border-radius:12px;
+        border:1px solid #eee;
+        box-shadow:0 4px 12px rgba(0,0,0,0.05);
+        ${i.done ? "background:#f3f4f6;" : ""}
+        ">
+          <div style="display:flex; align-items:center; gap:12px;">
+
           <form method="post" action="/plans/items/${i.id}/toggle">
           <input 
-            type="checkbox"
-            onchange="this.form.submit()"
-            ${i.done ? "checked" : ""}
-           />
+          type="checkbox"
+          onchange="this.form.submit()"
+          ${i.done ? "checked" : ""}
+          style="width:18px; height:18px;"
+        />
+      </form>
 
-          ${i.exercise} — ${i.weight}kg ${i.reps}×${i.sets}
+      <div>
+      <div style="font-weight:600; font-size:16px;">
+      ${i.exercise}
+      </div>
 
-         </form>
+      <div style="color:#666; font-size:14px;">
+        ${i.weight}kg × ${i.reps} × ${i.sets}
+       </div>
+      </div>
+
+    </div>
         </li>
       `).join("")}
     </ul>
 
     <p><a href="/plans">Back</a></p>
+    </div>
   `)
 
 })
@@ -53,24 +119,47 @@ app.get("/plans", async (c) => {
   const plans = await getWorkoutPlans()
 
   return c.html(`
-    <h1>Workout Plans</h1>
+    <div style="max-width:600px; margin:40px auto; background:white; padding:20px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
 
-    <form method="post" action="/plans">
-      <input name="name" placeholder="Plan name" />
-      <button>Add plan</button>
+    <h1 style="text-align:center;">📋 Workout Plans</h1>
+
+    <form method="post" action="/plans" style="display:flex; gap:10px; margin-top:20px;">
+      <input name="name" placeholder="Plan name" style="flex:1; padding:8px;" />
+      <button style="background:#6366f1; color:white; border:none; padding:8px 12px; border-radius:6px;">
+        Add
+      </button>
     </form>
 
-    <ul>
+    <ul style="list-style:none; padding:0; margin-top:20px;">
       ${plans.map((p) => `
-        <li>
-          <a href="/plans/${p.id}">
-            ${p.name}
-          </a>
-        </li>
+        <li style="
+        margin-top:10px;
+        padding:12px;
+        background:#f9fafc;
+        border-radius:10px;
+        border:1px solid #eee;
+        ">
+
+  <a href="/plans/${p.id}" style="
+    text-decoration:none;
+    color:black;
+    font-weight:500;
+    display:flex;
+    justify-content:space-between;
+  ">
+
+    ${p.name}
+
+    <span>→</span>
+
+  </a>
+
+</li>
       `).join("")}
     </ul>
 
     <p><a href="/">Back to workouts</a></p>
+    </div>
   `)
 
 })
@@ -137,7 +226,8 @@ app.post("/plans/items/:id/toggle", async (c) => {
 
   await togglePlanItem(id)
 
-  return c.redirect("back")
+  const referer = c.req.header("referer") || "/plans"
+  return c.redirect(referer)
 
 })
 

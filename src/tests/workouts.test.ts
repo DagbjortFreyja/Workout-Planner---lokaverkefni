@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { createWorkout, getWorkouts } from "../db/workouts.js"
 import { deleteWorkout } from "../db/workouts.js"
+import { create } from "domain"
 
 describe("workouts", () => {
 
@@ -28,10 +29,30 @@ describe("workouts", () => {
     await deleteWorkout(workout.id)
 
     const workouts = await getWorkouts()
-
     const found = workouts.find(w => w.id === workout.id)
 
     expect(found).toBeUndefined()
+  })
+
+  it("gets workouts", async () => {
+
+    await createWorkout("Get Test", 40, 12, 3)
+
+    const workouts = await getWorkouts()
+
+    expect(workouts.length).toBeGreaterThan(0)
+  })
+
+  it("returns correct data", async () => {
+
+    const workout = await createWorkout("Check Data", 70, 5, 3)
+    const workouts = await getWorkouts()
+    const found = workouts.find(w => w.id === workout.id)
+
+    expect(found?.weight).toBe(70)
+    expect(found?.reps).toBe(5)
+    expect(found?.sets).toBe(3)
+
   })
 
 })
